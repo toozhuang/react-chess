@@ -12,7 +12,7 @@ function App() {
   }
 
   const boardRef = useRef();
-  const chessBoard = mode ? <ComplexGame ref={boardRef} /> : <SimpleGame ref={boardRef}/>;
+  const chessBoard = !mode ? <ComplexGame ref={boardRef} /> : <SimpleGame ref={boardRef}/>;
 
   return (
     <div className="App">
