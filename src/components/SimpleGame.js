@@ -6,16 +6,18 @@ import { ToArray, ToString } from "../libs/Utils";
 
 const SimpleGame = forwardRef((props, ref) => {
     const [steps, setSteps] = useState('The initial Knight position: c3\r\n');
-    const [position, setPosition] = useState({c3: 'wN'});
+    const [position, setPosition] = useState({c1: 'wN'});
     const knight = new KnightMove();
 
     function move(idx) {
         let posStr = Object.keys(position)[0];
         let pos = ToArray(posStr);
+        console.log(pos) // c1 变成 【 3 ， 1】 位置
         let possibleMoves = knight.validMovesFor(pos);
-        let index = Math.floor(Math.random() * possibleMoves.length);
+        let index = Math.floor(Math.random() * possibleMoves.length);   // 随便取一个可以移动的位置
         let dest = ToString(possibleMoves[index]);
         setPosition(p => {
+            console.log('设置新的地方： ', p,dest)
             if (p.hasOwnProperty(posStr)) {
                 delete p[posStr];
             }
@@ -30,6 +32,7 @@ const SimpleGame = forwardRef((props, ref) => {
 
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
+    // 配合 forwardRef 使用； 相当于在 parent 中调用 ref 中的方法
     useImperativeHandle(ref, () => ({
         async play() {
             for (let i = 1; i < 11; i++) {

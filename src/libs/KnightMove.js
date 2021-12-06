@@ -1,8 +1,11 @@
 export default class KnightMove {
+    // static moves 没有特别的含义， 即一个简单的骑士步法
     static MOVES = [[1,2], [1,-2], [-1,2], [-1,-2], [2,1], [-2,1], [2,-1], [-2,-1]];
 
     validMovesFor(pos) {
         let result = [];
+        // 根据骑士步法来决定怎么走；
+        // 简单的根据 x，y 和 MOVES 的相加来得到走后的结果
         for (let move of KnightMove.MOVES) {
             let newX = pos[0] + move[0];
             let newY = pos[1] + move[1];
