@@ -4,11 +4,11 @@ import {forwardRef, useImperativeHandle, useState} from "react";
 import KnightMove from "../libs/KnightMove";
 import {ToArray, ToString} from "../libs/Utils";
 
-function getPositionByRole(role,position) {
+function getPositionByRole(role, position) {
     const positionKeyList = Object.keys(position);
-    for(let index =0; index<positionKeyList.length;index++){
+    for (let index = 0; index < positionKeyList.length; index++) {
         const positionKey = positionKeyList[index];
-        if(position[positionKey].toUpperCase()===role.toUpperCase()){
+        if (position[positionKey].toUpperCase() === role.toUpperCase()) {
             return positionKey
         }
     }
@@ -20,10 +20,11 @@ function getPositionByRole(role,position) {
  * @param position
  */
 function checkDest(dest, position) {
-    const positionKeyList = Object.keys(position);
-    for(let index =0; index<positionKeyList.length;index++){
+    const positionKeyList = Object.keys(position); // 现有的三个角色的位置
+    for (let index = 0; index < positionKeyList.length; index++) {
         const positionKey = positionKeyList[index];
-        if(dest===positionKey){
+        console.log('dest   '+ dest+ '  position  '+ positionKey)
+        if (dest === positionKey) {
             return false
         }
     }
@@ -41,8 +42,8 @@ const ComplexGame = forwardRef((props, ref) => {
     /**
      * wK 是骑士
      */
-    function moveKnight() {
-        let posStr =  getPositionByRole('wk',position);
+    function moveKnight(jumpCount) {
+        let posStr = getPositionByRole('wk', position);
         // Object.keys(position)[0];  // 获取 骑士当前的位置； 通过骑士的下标来获取
         // console.log(posStr)
         let pos = ToArray(posStr);
@@ -51,7 +52,7 @@ const ComplexGame = forwardRef((props, ref) => {
         let index = Math.floor(Math.random() * possibleMoves.length);   // 随便取一个可以移动的位置
         let dest = ToString(possibleMoves[index]);
         // 要对 dest 做判断， 如果 dest 存在当前的位置， 那么跳失败，即立马重新再跳一次
-        if(!checkDest(dest,position)){
+        if (!checkDest(dest, position)) {
             return false
             // 如果是错误的， 直接返回 false， 不需要再往下走来
         }
@@ -65,16 +66,16 @@ const ComplexGame = forwardRef((props, ref) => {
             return p;
         });
         setSteps(s => {
-            return s + "The Knight #" + " moves: " + dest + "\r\n";
+            return s + "The Knight #" + `${jumpCount} moves: ` + dest + "\r\n";
         })
         return true;
     }
 
-    function moveBishop(){
+    function moveBishop() {
 
     }
 
-    function moveQueen(){
+    function moveQueen() {
 
     }
 
@@ -84,13 +85,17 @@ const ComplexGame = forwardRef((props, ref) => {
     useImperativeHandle(ref, () => ({
         async play() {
             // 随机移动一次
+            // 按照 simple game 的逻辑， 每个英雄都跳10 次吧
             // 先 hardCode 每次随机都是骑士jump
-            let jumpAble = moveKnight()
-            while(!jumpAble){
-               jumpAble = moveKnight()
-                console.log('jump one more ')
+            for (let jumpCount = 1; jumpCount < 11; jumpCount++) {
+                let jumpAble = moveKnight(jumpCount)
+                while (!jumpAble) {
+                    jumpAble = moveKnight(jumpCount)
+                    console.log('jump one more ')
+                }
+                await delay(1000);
             }
-            await delay(1000);
+
         }
     }));
 
