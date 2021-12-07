@@ -8,15 +8,18 @@
  * 左下 [-1,-1]
  */
 
+import {generateMoves} from "./moveUtils";
+
 export default class BishopMove {
-    // static moves
-    static MOVES = [[1, 1], [-1, 1], [1, -1], [-1, -1]];
+    // static moves (跳一次的情况)
+    static STEP_MOVES = [[1, 1], [-1, 1], [1, -1], [-1, -1]];
 
     validMovesFor(pos) {
         let result = [];
         // 这个就可以简单的套用骑士的跳跳逻辑了
+        const MOVES =  generateMoves(BishopMove.STEP_MOVES)
         // 简单的根据 x，y 和 MOVES 的相加来得到走后的结果
-        for (let move of BishopMove.MOVES) {
+        for (let move of MOVES) {
             let newX = pos[0] + move[0];
             let newY = pos[1] + move[1];
 
@@ -24,7 +27,6 @@ export default class BishopMove {
                 continue;
             result.push([newX, newY]);
         }
-
         return result;
     }
 }

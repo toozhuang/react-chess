@@ -40,7 +40,7 @@ function checkDest(dest, position) {
 
 
 const ComplexGame = forwardRef((props, ref) => {
-    const [steps, setSteps] = useState('The initial Knight position: c3\r\n');
+    const [steps, setSteps] = useState('The initial Knight position: c3; The initial Bishop position: d5; The initial Knight Queen: a4\r\n');
     const [position, setPosition] = useState({c2: 'wK', a4: 'wQ', d5: 'wB'});  //Knight  Bishop Queen);
 
     const knight = new KnightMove();
@@ -80,92 +80,6 @@ const ComplexGame = forwardRef((props, ref) => {
     }
 
 
-    /**
-     * wK 是骑士
-     */
-    function moveKnight(jumpCount) {
-        let posStr = getPositionByRole('wk', position);
-        // Object.keys(position)[0];  // 获取 骑士当前的位置； 通过骑士的下标来获取
-        // console.log(posStr)
-        let pos = ToArray(posStr);
-        // console.log(pos) // c1 变成 【 3 ， 1】 位置
-        let possibleMoves = knight.validMovesFor(pos);
-        let index = Math.floor(Math.random() * possibleMoves.length);   // 随便取一个可以移动的位置
-        let dest = ToString(possibleMoves[index]);
-        // 要对 dest 做判断， 如果 dest 存在当前的位置， 那么跳失败，即立马重新再跳一次
-        if (!checkDest(dest, position)) {
-            return false
-            // 如果是错误的， 直接返回 false， 不需要再往下走来
-        }
-        setPosition(p => {
-            if (p.hasOwnProperty(posStr)) {
-                delete p[posStr];
-            }
-            // console.log('old p:',p)
-            p[dest] = 'wK';
-            // console.log(' new p: ',p)
-            return p;
-        });
-        setSteps(s => {
-            return s + "The Knight #" + `${jumpCount} moves: ` + dest + "\r\n";
-        })
-        return true;
-    }
-
-    function moveBishop(jumpCount) {
-        let posStr = getPositionByRole('wB', position);
-        let pos = ToArray(posStr);
-        // console.log(pos) // c1 变成 【 3 ， 1】 位置
-        let possibleMoves = bishop.validMovesFor(pos);
-        let index = Math.floor(Math.random() * possibleMoves.length);   // 随便取一个可以移动的位置
-        let dest = ToString(possibleMoves[index]);
-        // 要对 dest 做判断， 如果 dest 存在当前的位置， 那么跳失败，即立马重新再跳一次
-        if (!checkDest(dest, position)) {
-            return false
-            // 如果是错误的， 直接返回 false， 不需要再往下走来
-        }
-        setPosition(p => {
-            if (p.hasOwnProperty(posStr)) {
-                delete p[posStr];
-            }
-            // console.log('old p:',p)
-            p[dest] = 'wB';
-            // console.log(' new p: ',p)
-            return p;
-        });
-        setSteps(s => {
-            return s + "The Bishop #" + `${jumpCount} moves: ` + dest + "\r\n";
-        })
-        return true;
-    }
-
-    function moveQueen(jumpCount) {
-        let posStr = getPositionByRole('wQ', position);
-        let pos = ToArray(posStr);
-        // console.log(pos) // c1 变成 【 3 ， 1】 位置
-        let possibleMoves = queen.validMovesFor(pos);
-        let index = Math.floor(Math.random() * possibleMoves.length);   // 随便取一个可以移动的位置
-        let dest = ToString(possibleMoves[index]);
-        // 要对 dest 做判断， 如果 dest 存在当前的位置， 那么跳失败，即立马重新再跳一次
-        if (!checkDest(dest, position)) {
-            return false
-            // 如果是错误的， 直接返回 false， 不需要再往下走来
-        }
-        setPosition(p => {
-            if (p.hasOwnProperty(posStr)) {
-                delete p[posStr];
-            }
-            // console.log('old p:',p)
-            p[dest] = 'wQ';
-            // console.log(' new p: ',p)
-            return p;
-        });
-        setSteps(s => {
-            return s + "The Queen #" + `${jumpCount} moves: ` + dest + "\r\n";
-        })
-        return true;
-    }
-
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
     // 配合 forwardRef 使用； 相当于在 parent 中调用 ref 中的方法
@@ -173,14 +87,13 @@ const ComplexGame = forwardRef((props, ref) => {
         async play() {
             // 随机角色跳
             // c2: 'wK', a4: 'wQ', d5: 'wB'
-            const roleList = [{key: 'wB', name: 'bishop'}, {key: 'wQ', name: 'queen'}, {key: 'wK', name: 'knight'}]
+            const roleList = [{key: 'wQ', name: 'queen'}, {key: 'wB', name: 'bishop'}, {key: 'wK', name: 'knight'}]
             const role = roleList[Math.floor(Math.random() * roleList.length)]
-            console.log(role.name)
             // 每次点击，随机一个role 随机跳一次（不再是 simple game 中的 10 次）
             let jumpAble = moveByRole(role)
             while (!jumpAble) {
+                await delay(500);  // 再跳一次
                 jumpAble = moveByRole(role)
-                console.log('jump one more ')
             }
         }
     }));

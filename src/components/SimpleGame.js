@@ -12,12 +12,10 @@ const SimpleGame = forwardRef((props, ref) => {
     function move(idx) {
         let posStr = Object.keys(position)[0];
         let pos = ToArray(posStr);
-        console.log(pos) // c1 变成 【 3 ， 1】 位置
         let possibleMoves = knight.validMovesFor(pos);
         let index = Math.floor(Math.random() * possibleMoves.length);   // 随便取一个可以移动的位置
         let dest = ToString(possibleMoves[index]);
         setPosition(p => {
-            console.log('设置新的地方： ', p,dest)
             if (p.hasOwnProperty(posStr)) {
                 delete p[posStr];
             }

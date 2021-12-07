@@ -1,6 +1,5 @@
 /***
  * Queen – 在棋盘边界内沿对角线、水平或垂直方向移动任意距离
- * TODO：  当前是固定每次只移动一次， 一个步；但按照理解，应该是可以任意的步数
  * 也就是我一次能从我的以我自己为中心， 上下左右随机跳动 (先 x 后 y)
  * 这里对于每次的跳动采取完全用`+` 来实现； 所以步数会为 **负数**
  * 上 [0,1]
@@ -13,15 +12,18 @@
  * 左下 [-1,-1]
  */
 
+import {generateMoves} from "./moveUtils";
+
 export default class QueenMove {
     // static moves
-    static MOVES = [[0, 1], [0, -1], [-1, 0], [1, 0], [1, 1], [-1, 1], [1, -1], [-1, -1]];
+    static STEP_MOVES = [[0, 1], [0, -1], [-1, 0], [1, 0], [1, 1], [-1, 1], [1, -1], [-1, -1]];
 
     validMovesFor(pos) {
         let result = [];
         // 这个就可以简单的套用骑士的跳跳逻辑了
         // 简单的根据 x，y 和 MOVES 的相加来得到走后的结果
-        for (let move of QueenMove.MOVES) {
+        const MOVES = generateMoves(QueenMove.STEP_MOVES)
+        for (let move of MOVES) {
             let newX = pos[0] + move[0];
             let newY = pos[1] + move[1];
 
