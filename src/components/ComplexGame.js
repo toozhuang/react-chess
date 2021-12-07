@@ -58,8 +58,9 @@ const ComplexGame = forwardRef((props, ref) => {
         let posStr = getPositionByRole(role.key, position);
         let pos = ToArray(posStr);
         let possibleMoves = moveStrategy[role.name].validMovesFor(pos);
+
         let index = Math.floor(Math.random() * possibleMoves.length);   // 随便取一个可以移动的位置
-        let dest = ToString(possibleMoves[index]);
+        let dest = ToString(possibleMoves[index])
         // 要对 dest 做判断， 如果 dest 存在当前的位置， 那么跳失败，即立马重新再跳一次
         if (!checkDest(dest, position)) {
             return false

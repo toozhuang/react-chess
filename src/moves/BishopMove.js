@@ -1,32 +1,25 @@
 /***
  * Bishop - 沿对角线移动，在棋盘边界内任意距离
  * 也就是我一次能从我的以我自己为中心， 右上；右下；左上；左下(先 x 后 y)
- * 这里对于每次的跳动采取完全用`+` 来实现； 所以步数会为 **负数**
- * 右上 [1,1]
- * 左上 [-1,1]
- * 右下 [1,-1]
- * 左下 [-1,-1]
+ * 即先确定一个 x  该 x 是随机数字出来以后的一个值
+ * 当该 x 确定了以后， 对应的 y
  */
 
-import {generateMoves} from "./moveUtils";
-
 export default class BishopMove {
-    // static moves (跳一次的情况)
-    static STEP_MOVES = [[1, 1], [-1, 1], [1, -1], [-1, -1]];
 
     validMovesFor(pos) {
-        let result = [];
-        // 这个就可以简单的套用骑士的跳跳逻辑了
-        const MOVES =  generateMoves(BishopMove.STEP_MOVES)
-        // 简单的根据 x，y 和 MOVES 的相加来得到走后的结果
-        for (let move of MOVES) {
-            let newX = pos[0] + move[0];
-            let newY = pos[1] + move[1];
+        const randomX = Math.floor(Math.random() * 8+1);   // 随便取一个可以移动的位置
+        return generateMOVES(pos, randomX);
+    }
+}
 
-            if (newX > 8 || newX < 1 || newY > 8 || newY < 1)
-                continue;
-            result.push([newX, newY]);
-        }
-        return result;
+const generateMOVES = (position, randomX)=>{
+    const [x,y]= position
+
+    if(randomX === x){
+        return [[x,y]]     // 但这个时候，回去后肯定要 again 的；交给外面考虑
+    }else{
+        //  不等于 x 的话， 要保证对角线移动
+        return [[randomX, randomX], [randomX, y + Math.abs(randomX - x)], [randomX, y - Math.abs(randomX - x)]].filter(item => item[1] > 0 && item[1] < 9);
     }
 }

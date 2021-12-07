@@ -1,5 +1,6 @@
 /**
  * Queen 考虑的方向多一些
+ * Note: 更改算法逻辑后弃用
  */
 export function generateMoves(originalMoves) {
     const moves = [];

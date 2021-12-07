@@ -9,20 +9,20 @@ export default class QueenMove {
     validMovesFor(pos) {
         // 这个就可以简单的套用骑士的跳跳逻辑了
         // 简单的根据 x，y 和 MOVES 的相加来得到走后的结果
-        const randomX = Math.floor(Math.random() * 7);   // 随便取一个可以移动的位置
+        const randomX = Math.floor(Math.random() * 8 + 1);   // 随便取一个可以移动的位置
         // 根据该 randomX 的值 （比如为 2）， 老的 x 为 2，老的 Y 值为 1 则可以确定 新的 x 的值为 4
         // 则 新的 Y 的值 为 1 + 2  或者 1 - 2
         return generateMOVES(pos, randomX);
     }
 }
 
-const generateMOVES = (position, randomX)=>{
-    const [x,y]= position
+const generateMOVES = (position, randomX) => {
+    const [x, y] = position
 
-    if(randomX === x){
-        return [randomX, Math.floor(Math.random() * 7)]     // 随机生成一个 Y 就好
-    }else{
+    if (randomX === x) {
+        return [[randomX, Math.floor(Math.random() * 7) + 1]]   // 随机生成一个 Y 就好
+    } else {
         //  不等于 x 的话， 要保证对角线移动
-        return [[randomX, y + Math.abs(randomX-x)],[randomX,y-Math.abs(randomX-x)]].filter(item=>item[1]>0)
+        return [[randomX, randomX], [randomX, y + Math.abs(randomX - x)], [randomX, y - Math.abs(randomX - x)]].filter(item => item[1] > 0 && item[1] < 9);
     }
 }
