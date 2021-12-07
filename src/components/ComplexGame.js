@@ -6,6 +6,12 @@ import {ToArray, ToString} from "../libs/Utils";
 import QueenMove from "../moves/QueenMove";
 import BishopMove from "../moves/BishopMove";
 
+/**
+ * 返回为 ： 返回最开始初始化的role的位置
+ * @param role
+ * @param position
+ * @returns {string}
+ */
 function getPositionByRole(role, position) {
     const positionKeyList = Object.keys(position);
     for (let index = 0; index < positionKeyList.length; index++) {
@@ -25,7 +31,6 @@ function checkDest(dest, position) {
     const positionKeyList = Object.keys(position); // 现有的三个角色的位置
     for (let index = 0; index < positionKeyList.length; index++) {
         const positionKey = positionKeyList[index];
-        console.log('dest   '+ dest+ '  position  '+ positionKey)
         if (dest === positionKey) {
             return false
         }
@@ -33,13 +38,47 @@ function checkDest(dest, position) {
     return true;
 }
 
+
 const ComplexGame = forwardRef((props, ref) => {
     const [steps, setSteps] = useState('The initial Knight position: c3\r\n');
     const [position, setPosition] = useState({c2: 'wK', a4: 'wQ', d5: 'wB'});  //Knight  Bishop Queen);
-    // 当前把三个角色都当成 Knight 的方式来跳
+
     const knight = new KnightMove();
     const bishop = new BishopMove();
     const queen = new QueenMove();
+
+    const moveStrategy = {
+        knight,
+        bishop,
+        queen
+    }
+
+
+    function moveByRole(role) {
+        let posStr = getPositionByRole(role.key, position);
+        let pos = ToArray(posStr);
+        let possibleMoves = moveStrategy[role.name].validMovesFor(pos);
+        let index = Math.floor(Math.random() * possibleMoves.length);   // 随便取一个可以移动的位置
+        let dest = ToString(possibleMoves[index]);
+        // 要对 dest 做判断， 如果 dest 存在当前的位置， 那么跳失败，即立马重新再跳一次
+        if (!checkDest(dest, position)) {
+            return false
+            // 如果是错误的， 直接返回 false， 不需要再往下走来
+        }
+        // 更新 新的 position； react hook state 保存
+        setPosition(p => {
+            if (p.hasOwnProperty(posStr)) {
+                delete p[posStr];
+            }
+            p[dest] = role.key;
+            return p;
+        });
+        setSteps(s => {
+            return s + `The ${role.name.toUpperCase()} moves: ` + dest + "\r\n";
+        })
+        return true;
+    }
+
 
     /**
      * wK 是骑士
@@ -132,36 +171,17 @@ const ComplexGame = forwardRef((props, ref) => {
     // 配合 forwardRef 使用； 相当于在 parent 中调用 ref 中的方法
     useImperativeHandle(ref, () => ({
         async play() {
-            // 随机移动一次
-            // 按照 simple game 的逻辑， 每个英雄都跳10 次吧
-            // 先 hardCode 每次随机都是骑士jump
-            // for (let jumpCount = 1; jumpCount < 11; jumpCount++) {
-            //     let jumpAble = moveKnight(jumpCount)
-            //     while (!jumpAble) {
-            //         jumpAble = moveKnight(jumpCount)
-            //         console.log('jump one more ')
-            //     }
-            //     await delay(1000);
-            // }
-            // // 测试皇后跳 皇后就多跳跳吧
-            // for (let jumpCount = 1; jumpCount < 31; jumpCount++) {
-            //     let jumpAble = moveQueen(jumpCount)
-            //     while (!jumpAble) {
-            //         jumpAble = moveQueen(jumpCount)
-            //         console.log('jump one more ')
-            //     }
-            //     await delay(1000);
-            // }
-            // 测试主教跳
-            for (let jumpCount = 1; jumpCount < 31; jumpCount++) {
-                let jumpAble = moveBishop(jumpCount)
-                while (!jumpAble) {
-                    jumpAble = moveBishop(jumpCount)
-                    console.log('jump one more ')
-                }
-                await delay(1000);
+            // 随机角色跳
+            // c2: 'wK', a4: 'wQ', d5: 'wB'
+            const roleList = [{key: 'wB', name: 'bishop'}, {key: 'wQ', name: 'queen'}, {key: 'wK', name: 'knight'}]
+            const role = roleList[Math.floor(Math.random() * roleList.length)]
+            console.log(role.name)
+            // 每次点击，随机一个role 随机跳一次（不再是 simple game 中的 10 次）
+            let jumpAble = moveByRole(role)
+            while (!jumpAble) {
+                jumpAble = moveByRole(role)
+                console.log('jump one more ')
             }
-
         }
     }));
 
