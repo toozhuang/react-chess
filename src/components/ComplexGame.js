@@ -4,6 +4,7 @@ import {forwardRef, useImperativeHandle, useState} from "react";
 import KnightMove from "../libs/KnightMove";
 import {ToArray, ToString} from "../libs/Utils";
 import QueenMove from "../moves/QueenMove";
+import BishopMove from "../moves/BishopMove";
 
 function getPositionByRole(role, position) {
     const positionKeyList = Object.keys(position);
@@ -37,7 +38,7 @@ const ComplexGame = forwardRef((props, ref) => {
     const [position, setPosition] = useState({c2: 'wK', a4: 'wQ', d5: 'wB'});  //Knight  Bishop Queen);
     // 当前把三个角色都当成 Knight 的方式来跳
     const knight = new KnightMove();
-    const bishop = new KnightMove();
+    const bishop = new BishopMove();
     const queen = new QueenMove();
 
     /**
@@ -72,8 +73,31 @@ const ComplexGame = forwardRef((props, ref) => {
         return true;
     }
 
-    function moveBishop() {
-
+    function moveBishop(jumpCount) {
+        let posStr = getPositionByRole('wB', position);
+        let pos = ToArray(posStr);
+        // console.log(pos) // c1 变成 【 3 ， 1】 位置
+        let possibleMoves = bishop.validMovesFor(pos);
+        let index = Math.floor(Math.random() * possibleMoves.length);   // 随便取一个可以移动的位置
+        let dest = ToString(possibleMoves[index]);
+        // 要对 dest 做判断， 如果 dest 存在当前的位置， 那么跳失败，即立马重新再跳一次
+        if (!checkDest(dest, position)) {
+            return false
+            // 如果是错误的， 直接返回 false， 不需要再往下走来
+        }
+        setPosition(p => {
+            if (p.hasOwnProperty(posStr)) {
+                delete p[posStr];
+            }
+            // console.log('old p:',p)
+            p[dest] = 'wB';
+            // console.log(' new p: ',p)
+            return p;
+        });
+        setSteps(s => {
+            return s + "The Bishop #" + `${jumpCount} moves: ` + dest + "\r\n";
+        })
+        return true;
     }
 
     function moveQueen(jumpCount) {
@@ -119,11 +143,20 @@ const ComplexGame = forwardRef((props, ref) => {
             //     }
             //     await delay(1000);
             // }
-            // 测试皇后跳 皇后就多跳跳吧
+            // // 测试皇后跳 皇后就多跳跳吧
+            // for (let jumpCount = 1; jumpCount < 31; jumpCount++) {
+            //     let jumpAble = moveQueen(jumpCount)
+            //     while (!jumpAble) {
+            //         jumpAble = moveQueen(jumpCount)
+            //         console.log('jump one more ')
+            //     }
+            //     await delay(1000);
+            // }
+            // 测试主教跳
             for (let jumpCount = 1; jumpCount < 31; jumpCount++) {
-                let jumpAble = moveQueen(jumpCount)
+                let jumpAble = moveBishop(jumpCount)
                 while (!jumpAble) {
-                    jumpAble = moveQueen(jumpCount)
+                    jumpAble = moveBishop(jumpCount)
                     console.log('jump one more ')
                 }
                 await delay(1000);
