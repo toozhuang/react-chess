@@ -3,6 +3,7 @@ import {TextField} from "@mui/material";
 import {forwardRef, useImperativeHandle, useState} from "react";
 import KnightMove from "../libs/KnightMove";
 import {ToArray, ToString} from "../libs/Utils";
+import QueenMove from "../moves/QueenMove";
 
 function getPositionByRole(role, position) {
     const positionKeyList = Object.keys(position);
@@ -37,7 +38,7 @@ const ComplexGame = forwardRef((props, ref) => {
     // 当前把三个角色都当成 Knight 的方式来跳
     const knight = new KnightMove();
     const bishop = new KnightMove();
-    const queen = new KnightMove();
+    const queen = new QueenMove();
 
     /**
      * wK 是骑士
@@ -75,8 +76,31 @@ const ComplexGame = forwardRef((props, ref) => {
 
     }
 
-    function moveQueen() {
-
+    function moveQueen(jumpCount) {
+        let posStr = getPositionByRole('wQ', position);
+        let pos = ToArray(posStr);
+        // console.log(pos) // c1 变成 【 3 ， 1】 位置
+        let possibleMoves = queen.validMovesFor(pos);
+        let index = Math.floor(Math.random() * possibleMoves.length);   // 随便取一个可以移动的位置
+        let dest = ToString(possibleMoves[index]);
+        // 要对 dest 做判断， 如果 dest 存在当前的位置， 那么跳失败，即立马重新再跳一次
+        if (!checkDest(dest, position)) {
+            return false
+            // 如果是错误的， 直接返回 false， 不需要再往下走来
+        }
+        setPosition(p => {
+            if (p.hasOwnProperty(posStr)) {
+                delete p[posStr];
+            }
+            // console.log('old p:',p)
+            p[dest] = 'wQ';
+            // console.log(' new p: ',p)
+            return p;
+        });
+        setSteps(s => {
+            return s + "The Queen #" + `${jumpCount} moves: ` + dest + "\r\n";
+        })
+        return true;
     }
 
     const delay = ms => new Promise(res => setTimeout(res, ms));
@@ -87,10 +111,19 @@ const ComplexGame = forwardRef((props, ref) => {
             // 随机移动一次
             // 按照 simple game 的逻辑， 每个英雄都跳10 次吧
             // 先 hardCode 每次随机都是骑士jump
-            for (let jumpCount = 1; jumpCount < 11; jumpCount++) {
-                let jumpAble = moveKnight(jumpCount)
+            // for (let jumpCount = 1; jumpCount < 11; jumpCount++) {
+            //     let jumpAble = moveKnight(jumpCount)
+            //     while (!jumpAble) {
+            //         jumpAble = moveKnight(jumpCount)
+            //         console.log('jump one more ')
+            //     }
+            //     await delay(1000);
+            // }
+            // 测试皇后跳 皇后就多跳跳吧
+            for (let jumpCount = 1; jumpCount < 31; jumpCount++) {
+                let jumpAble = moveQueen(jumpCount)
                 while (!jumpAble) {
-                    jumpAble = moveKnight(jumpCount)
+                    jumpAble = moveQueen(jumpCount)
                     console.log('jump one more ')
                 }
                 await delay(1000);
