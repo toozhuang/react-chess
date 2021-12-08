@@ -23,6 +23,6 @@ const generateMOVES = (position, randomX) => {
         return [[randomX, Math.floor(Math.random() * 7) + 1]]   // 随机生成一个 Y 就好
     } else {
         //  不等于 x 的话， 要保证对角线移动
-        return [[randomX, randomX], [randomX, y + Math.abs(randomX - x)], [randomX, y - Math.abs(randomX - x)]].filter(item => item[1] > 0 && item[1] < 9);
+        return [[randomX, y], [randomX, y + Math.abs(randomX - x)], [randomX, y - Math.abs(randomX - x)]].filter(item => item[1] > 0 && item[1] < 9);
     }
 }

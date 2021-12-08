@@ -20,6 +20,6 @@ const generateMOVES = (position, randomX)=>{
         return [[x,y]]     // 但这个时候，回去后肯定要 again 的；交给外面考虑
     }else{
         //  不等于 x 的话， 要保证对角线移动
-        return [[randomX, randomX], [randomX, y + Math.abs(randomX - x)], [randomX, y - Math.abs(randomX - x)]].filter(item => item[1] > 0 && item[1] < 9);
+        return [[randomX, y + Math.abs(randomX - x)], [randomX, y - Math.abs(randomX - x)]].filter(item => item[1] > 0 && item[1] < 9);
     }
 }
